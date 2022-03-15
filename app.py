@@ -653,20 +653,60 @@ if not app.debug:
     app.logger.info('errors')
 
 #for local testing only
-def drop_create(app):
-  app.drop_all()
-  app.create_all()
+def create_objs():
+  populate_artist()
+  populate_venue()
+  populate_genres()
+  create_shows()
 
 def populate_artist():
-  russell = Artist(name="Russell", city="Harare", state="NA", address="547 One way Harare", phone="547 335", image_link="http://images.com", facebook_link="facebook.com", website="www.me.com", venue_seek= False, seeking_desc="Not seeking talent")
-  db.session.add(russell)
-  db.session.commit()
+  import csv
+  artist_list = []
+  file_name = "to_de_deleted/artist.csv"
+  with open(file_name,"r") as file:
+    reader = csv.reader(file, delimiter=",")
+    header = next(reader)
+    for row in reader:
+      artist = Artist(id=row[0], name=row[1], city=row[2], state=row[3], address=row[4], phone=[5], image_link=row[6], facebook_link=row[7], website=row[8], venue_seek=bool(row[9].title()), seeking_desc=row[10])
+      artist_list.append(artist)
+    db.session.add_all(artist_list)
+    db.session.commit()
 
 def populate_venue():
-  grand = Venue(name="Grand Hotel", city="Harare", state="CA", address="547 Another way Harare", phone="547 335", image_link="http://images.com", facebook_link="facebook.com", website="www.me.com", talent = False, seeking_desc="Not seeking venue")
-  db.session.add(grand)
-  db.session.commit()
+  import csv
+  venue_list = []
+  file_name = "to_de_deleted/venue.csv"
+  with open(file_name,"r") as file:
+    reader = csv.reader(file, delimiter=",")
+    header = next(reader)
+    for row in reader:
+      venue = Venue(id=row[0], name=row[1], city=row[2], state=row[3], address=row[4], phone=[5], image_link=row[6], facebook_link=row[7], website=row[8], talent=bool(row[9].title()), seeking_desc=row[10])
+      venue_list.append(venue)
+    db.session.add_all(venue_list)
+    db.session.commit()
 
+def populate_genres():
+  import csv
+  genre_list = []
+  file_name = "to_de_deleted/genres.csv"
+  with open(file_name,"r") as file:
+    reader = csv.reader(file, delimiter=",")
+    header = next(reader)
+    for row in reader:
+      genre = Genre(id=row[0], name=row[1])
+      genre_list.append(genre)
+    db.session.add_all(genre_list)
+    db.session.commit()
+
+def create_shows():
+  artist1 = Artist.query.first()
+  artist2 = Artist.query.all()[2]
+  venue1 = Venue.query.first()
+  venue2 = Venue.query.all()[2]
+  show1 = Show(artist_id=artist1.id, venue_id=venue1.id, start_time = datetime.datetime.now())
+  show2 = Show(artist_id=artist2.id, venue_id=venue1.id)
+  db.session.add_all([show1,show2])
+  db.session.commit()
 #----------------------------------------------------------------------------#
 # Launch.
 #----------------------------------------------------------------------------#
