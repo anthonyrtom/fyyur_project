@@ -1,6 +1,7 @@
 #----------------------------------------------------------------------------#
 # Imports
 #----------------------------------------------------------------------------#
+from calendar import month
 from flask_migrate import Migrate
 import json
 import dateutil.parser
@@ -142,11 +143,8 @@ def venues():
       state = venue.state
       all_areas = Venue.query.filter_by(city=city, state=state).all()
       for area in all_areas:
-        shows = db.session.query(Show).filter(Show.venue_id==venue.id, Show.start_time > today).all()
-        shows_count = 0
-        if len(shows) > 0:
-          shows_count = db.session.query(func.count(shows.start_time)).first()
-          shows_count = len(shows_count)
+        shows = db.session.query(Show).filter(Show.venue_id==venue.id, Show.start_time > today)
+        shows_count = shows.count()
         venues.append({"id": area.id, "name": area.name, "num_upcoming_shows": shows_count})
       data.append({"city":city, "state": state, "venues": venues})
   except:
@@ -205,7 +203,7 @@ def show_venue(venue_id):
         "artist_id" : artist.id,
         "artist_name" : artist.name,
         "artist_image_link" : artist.image_link,
-        "start_time" : show.start_time
+        "start_time" : datetime.datetime.strftime(show.start_time,"%Y/%m/%d %H:%M")
       }
       future_shows.append(show_dict)
     data["upcoming_shows"] = future_shows
@@ -252,11 +250,11 @@ def create_venue_submission():
     seeking_talent = request.form.get("seeking_talent")
     seeking_description = request.form.get("seeking_description")
     genres = request.form.getlist("genres")
-    id = 504
+
     talent = False
     if seeking_talent == 'y':
       talent = True
-    this_venue = Venue(id = id, name = name, state = state, city = city, address = address, phone = phone, facebook_link = facebook_link, website = website_link, image_link = image_link, talent = talent, seeking_desc = seeking_description)
+    this_venue = Venue(name = name, state = state, city = city, address = address, phone = phone, facebook_link = facebook_link, website = website_link, image_link = image_link, talent = talent, seeking_desc = seeking_description)
     #loop over each genre in the list and dertemine if the genre exists in Genre table
     #if it doesnt exist first add it to the genre table
     current_genres = []
@@ -554,7 +552,7 @@ def create_artist_submission():
     venue_seek = False
     if seeking_talent == 'y':
       venue_seek = True
-    this_artist = Artist(id = 503,name = name, state = state, city = city, phone = phone, facebook_link = facebook_link, website = website_link, image_link = image_link, venue_seek = venue_seek, seeking_desc = seeking_description)
+    this_artist = Artist(name = name, state = state, city = city, phone = phone, facebook_link = facebook_link, website = website_link, image_link = image_link, venue_seek = venue_seek, seeking_desc = seeking_description)
     #loop over each genre in the list and dertemine if the genre exists in Genre table
     #if it doesnt exist first add it to the genre table
     current_genres = []
@@ -652,61 +650,73 @@ if not app.debug:
     app.logger.addHandler(file_handler)
     app.logger.info('errors')
 
-#for local testing only
-def create_objs():
-  populate_artist()
-  populate_venue()
-  populate_genres()
-  create_shows()
+# #for local testing only
+# def create():
+#   populate_artist()
+#   populate_venue()
+#   populate_genres()
+#   create_shows()
 
-def populate_artist():
-  import csv
-  artist_list = []
-  file_name = "to_de_deleted/artist.csv"
-  with open(file_name,"r") as file:
-    reader = csv.reader(file, delimiter=",")
-    header = next(reader)
-    for row in reader:
-      artist = Artist(id=row[0], name=row[1], city=row[2], state=row[3], address=row[4], phone=[5], image_link=row[6], facebook_link=row[7], website=row[8], venue_seek=bool(row[9].title()), seeking_desc=row[10])
-      artist_list.append(artist)
-    db.session.add_all(artist_list)
-    db.session.commit()
+# def populate_artist():
+#   import csv
+#   artist_list = []
+#   file_name = "to_de_deleted/artists.csv"
+#   with open(file_name,"r") as file:
+#     reader = csv.reader(file, delimiter=",")
+#     #header = next(reader)
+#     for row in reader:
+#       artist = Artist(id=row[0], name=row[1], city=row[2], state=row[3], address=row[4], phone=[5], image_link=row[6], facebook_link=row[7], website=row[8], venue_seek=bool(row[9].title()), seeking_desc=row[10])
+#       artist_list.append(artist)
+#     db.session.add_all(artist_list)
+#     db.session.commit()
 
-def populate_venue():
-  import csv
-  venue_list = []
-  file_name = "to_de_deleted/venue.csv"
-  with open(file_name,"r") as file:
-    reader = csv.reader(file, delimiter=",")
-    header = next(reader)
-    for row in reader:
-      venue = Venue(id=row[0], name=row[1], city=row[2], state=row[3], address=row[4], phone=[5], image_link=row[6], facebook_link=row[7], website=row[8], talent=bool(row[9].title()), seeking_desc=row[10])
-      venue_list.append(venue)
-    db.session.add_all(venue_list)
-    db.session.commit()
+# def populate_venue():
+#   import csv
+#   venue_list = []
+#   file_name = "to_de_deleted/venues.csv"
+#   with open(file_name,"r") as file:
+#     reader = csv.reader(file, delimiter=",")
+#     #header = next(reader)
+#     for row in reader:
+#       venue = Venue(id=row[0], name=row[1], city=row[2], state=row[3], address=row[4], phone=[5], image_link=row[6], facebook_link=row[7], website=row[8], talent=bool(row[9].title()), seeking_desc=row[10])
+#       venue_list.append(venue)
+#     db.session.add_all(venue_list)
+#     db.session.commit()
 
-def populate_genres():
-  import csv
-  genre_list = []
-  file_name = "to_de_deleted/genres.csv"
-  with open(file_name,"r") as file:
-    reader = csv.reader(file, delimiter=",")
-    header = next(reader)
-    for row in reader:
-      genre = Genre(id=row[0], name=row[1])
-      genre_list.append(genre)
-    db.session.add_all(genre_list)
-    db.session.commit()
+# def populate_genres():
+#   import csv
+#   genre_list = []
+#   file_name = "to_de_deleted/genres.csv"
+#   with open(file_name,"r") as file:
+#     reader = csv.reader(file, delimiter=",")
+#     header = next(reader)
+#     for row in reader:
+#       genre = Genre(id=row[0], name=row[1])
+#       genre_list.append(genre)
+#     db.session.add_all(genre_list)
+#     db.session.commit()
 
-def create_shows():
-  artist1 = Artist.query.first()
-  artist2 = Artist.query.all()[2]
-  venue1 = Venue.query.first()
-  venue2 = Venue.query.all()[2]
-  show1 = Show(artist_id=artist1.id, venue_id=venue1.id, start_time = datetime.datetime.now())
-  show2 = Show(artist_id=artist2.id, venue_id=venue1.id)
-  db.session.add_all([show1,show2])
-  db.session.commit()
+# def create_shows():
+#   import csv
+#   shows_list = []
+#   file_name = "to_de_deleted/shows.csv"
+#   with open(file_name,"r") as file:
+#     reader = csv.reader(file, delimiter=",")
+#     #header = next(reader)
+#     for row in reader:
+#       year = datetime.datetime.strptime(row[2],"%d/%m/%Y %H:%M").year
+#       month = datetime.datetime.strptime(row[2],"%d/%m/%Y %H:%M").month
+#       day = datetime.datetime.strptime(row[2],"%d/%m/%Y %H:%M").day
+#       hr = datetime.datetime.strptime(row[2],"%d/%m/%Y %H:%M").hour
+#       min = datetime.datetime.strptime(row[2],"%d/%m/%Y %H:%M").minute
+#       sec = datetime.datetime.strptime(row[2],"%d/%m/%Y %H:%M").second
+#       new_date = datetime.datetime.strptime(row[2],"%d/%m/%Y %H:%M")
+#       if year <= 2000:
+#         new_date = datetime.datetime(2023, month, day, hr, min, sec)
+#       show = Show(artist_id=row[0], venue_id=row[1], start_time=new_date)
+#       shows_list.append(show)
+#   db.session.add_all(shows_list)
+#   db.session.commit()
 #----------------------------------------------------------------------------#
 # Launch.
 #----------------------------------------------------------------------------#
