@@ -159,24 +159,15 @@ def create_venue_submission():
     if seeking_talent == 'y':
       talent = True
     venue = Venue(name=form.name.data,
-    city=form.city.data, state=form.state.data,
-    address=form.address.data, phone=form.phone.data,
-     facebook_link=form.facebook_link.data,
+    city=form.city.data, 
+    state=form.state.data,
+    address=form.address.data, 
+    phone=form.phone.data,
+    facebook_link=form.facebook_link.data,
     image_link=form.image_link.data,
-    website_link=form.website_link.data,
-    seeking_desc=form.seeking_description.data, talent=talent )
-    #name = request.form.get("name")
-    #state = request.form.get("state")
-    #city = request.form.get("city")
-    #address = request.form.get("address")
-    #phone = request.form.get("phone")
-    #facebook_link = request.form.get("facebook_link")
-    #website_link = request.form.get("website_link")
-    #image_link = request.form.get("image_link")
-    #seeking_talent = request.form.get("seeking_talent")
-    #seeking_description = request.form.get("seeking_description")
-    #genres = request.form.getlist("genres")
-    # this_venue = Venue(name = name, state = state, city = city, address = address, phone = phone, facebook_link = facebook_link, website = website_link, image_link = image_link, talent = talent, seeking_desc = seeking_description)
+    website=form.website_link.data,
+    seeking_desc=form.seeking_description.data, 
+    talent=talent)
     #loop over each genre in the list and dertemine if the genre exists in Genre table
     #if it doesnt exist first add it to the genre table
     current_genres = []
@@ -587,12 +578,12 @@ if not app.debug:
 # def populate_artist():
 #   import csv
 #   artist_list = []
-#   file_name = "to_de_deleted/artists.csv"
+#   file_name = "flaskapp/to_be_deleted/artists.csv"
 #   with open(file_name,"r") as file:
 #     reader = csv.reader(file, delimiter=",")
 #     #header = next(reader)
 #     for row in reader:
-#       artist = Artist(id=row[0], name=row[1], city=row[2], state=row[3], address=row[4], phone=[5], image_link=row[6], facebook_link=row[7], website=row[8], venue_seek=bool(row[9].title()), seeking_desc=row[10])
+#       artist = Artist(name=row[0], city=row[1], state=row[2], address=row[3], phone=[4], image_link=row[5], facebook_link=row[6], website=row[7], venue_seek=bool(row[8].title()), seeking_desc=row[9])
 #       artist_list.append(artist)
 #     db.session.add_all(artist_list)
 #     db.session.commit()
@@ -600,12 +591,12 @@ if not app.debug:
 # def populate_venue():
 #   import csv
 #   venue_list = []
-#   file_name = "to_de_deleted/venues.csv"
+#   file_name = "flaskapp/to_be_deleted/venues.csv"
 #   with open(file_name,"r") as file:
 #     reader = csv.reader(file, delimiter=",")
 #     #header = next(reader)
 #     for row in reader:
-#       venue = Venue(id=row[0], name=row[1], city=row[2], state=row[3], address=row[4], phone=[5], image_link=row[6], facebook_link=row[7], website=row[8], talent=bool(row[9].title()), seeking_desc=row[10])
+#       venue = Venue(name=row[0], city=row[1], state=row[2], address=row[3], phone=[4], image_link=row[5], facebook_link=row[6], website=row[7], talent=bool(row[8].title()), seeking_desc=row[9])
 #       venue_list.append(venue)
 #     db.session.add_all(venue_list)
 #     db.session.commit()
@@ -613,12 +604,12 @@ if not app.debug:
 # def populate_genres():
 #   import csv
 #   genre_list = []
-#   file_name = "to_de_deleted/genres.csv"
+#   file_name = "flaskapp/to_be_deleted/genres.csv"
 #   with open(file_name,"r") as file:
 #     reader = csv.reader(file, delimiter=",")
-#     header = next(reader)
+#     #header = next(reader)
 #     for row in reader:
-#       genre = Genre(id=row[0], name=row[1])
+#       genre = Genre(name=row[0])
 #       genre_list.append(genre)
 #     db.session.add_all(genre_list)
 #     db.session.commit()
@@ -626,7 +617,7 @@ if not app.debug:
 # def create_shows():
 #   import csv
 #   shows_list = []
-#   file_name = "to_de_deleted/shows.csv"
+#   file_name = "flaskapp/to_be_deleted/shows.csv"
 #   with open(file_name,"r") as file:
 #     reader = csv.reader(file, delimiter=",")
 #     #header = next(reader)
